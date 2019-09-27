@@ -9,9 +9,27 @@ public class HttpResponse {
     private StatusLine statusLine;
     private final HttpHeader httpHeader;
     private byte[] body;
+    private final HttpVersion requestHttpVersion;
 
-    public HttpResponse() {
+    public HttpResponse(HttpVersion requestHttpVersion) {
         this.httpHeader = new HttpHeader();
+        this.requestHttpVersion = requestHttpVersion;
+    }
+
+    public void setResponseStatus(ResponseStatus responseStatus) {
+        this.statusLine = new StatusLine(requestHttpVersion, responseStatus);
+    }
+
+    public void addHeaderAttribute(String key, String value) {
+        this.httpHeader.addHeaderAttribute(key, value);
+    }
+
+    public void setBody(byte[] body) {
+        this.body = body;
+    }
+
+    public ResponseStatus getResponseStatus() {
+        return statusLine.getResponseStatus();
     }
 
     public byte[] serialize() {
@@ -24,21 +42,5 @@ public class HttpResponse {
         }
 
         return responseHeader.getBytes();
-    }
-
-    public void setResponseStatus(ResponseStatus responseStatus) {
-        this.statusLine = new StatusLine(HttpVersion.HTTP_1_1, responseStatus);
-    }
-
-    public void addHeaderAttribute(String key, String value) {
-        this.httpHeader.add(key, value);
-    }
-
-    public void setBody(byte[] body) {
-        this.body = body;
-    }
-
-    public ResponseStatus getResponseStatus() {
-        return statusLine.getResponseStatus();
     }
 }

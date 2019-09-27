@@ -1,8 +1,11 @@
 package http.request;
 
 import http.common.HttpHeader;
+import http.common.HttpVersion;
 import http.common.URL;
 import http.request.exception.InvalidHttpRequestException;
+import http.session.Session;
+import http.session.SessionRepository;
 
 public class HttpRequest {
     private final RequestLine requestLine;
@@ -41,5 +44,14 @@ public class HttpRequest {
 
     public RequestMethod getMethod() {
         return requestLine.getMethod();
+    }
+
+    public HttpVersion getHttpVersion() {
+        return requestLine.getVersion();
+    }
+
+    public Session getSession() {
+        String sessionId = httpHeader.getSessionId();
+        return SessionRepository.getInstance().getSession(sessionId);
     }
 }

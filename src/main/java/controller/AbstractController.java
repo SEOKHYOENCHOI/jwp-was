@@ -10,6 +10,7 @@ import java.util.Map;
 
 public abstract class AbstractController implements Controller {
     private final Map<RequestMethod, Controller> methodMap = new HashMap<>();
+    private final ViewResolver viewResolver = ViewResolver.getInstance();
 
     {
         methodMap.put(RequestMethod.GET, this::doGet);
@@ -18,11 +19,7 @@ public abstract class AbstractController implements Controller {
 
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
-        try {
-            methodMap.get(httpRequest.getMethod()).service(httpRequest, httpResponse);
-        } catch (Exception e) {
-            httpResponse.setResponseStatus(ResponseStatus.INTERNAL_SERVER_ERROR);
-        }
+        methodMap.get(httpRequest.getMethod()).service(httpRequest, httpResponse);
     }
 
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
@@ -31,5 +28,10 @@ public abstract class AbstractController implements Controller {
 
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
         httpResponse.setResponseStatus(ResponseStatus.METHOD_NOT_ALLOWED);
+    }
+
+    protected void handle(ModelAndView modelAndView, HttpResponse httpResponse) {
+        View view = viewResolver.resolve(modelAndView.getViewName());
+        view.render(modelAndView.getModelMap(), httpResponse);
     }
 }
